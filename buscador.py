@@ -63,7 +63,7 @@ if st.button('Buscar'):
                         st.metric(label="Nota Média", value=f"{detalhes.get('vote_average', 0):.1f}/10")
                         st.write(f"**Sinopse:** {detalhes.get('overview', 'Não disponível.')}")
                     
-                    st.subheader('Disponível para assinatura em:')
+                    st.subheader('Disponível em:')
                     
                     # --- VERSÃO FINAL E LIMPA ---
                     fontes_assinatura = [f for f in fontes if f.get("type") == "sub"]
