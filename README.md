@@ -7,6 +7,19 @@ O projeto consome e combina dados de duas APIs distintas para fornecer uma respo
 
 ---
 
+## ✨ Funcionalidades
+
+* **Busca Simples:** Digite o nome de um filme (em inglês) para iniciar a busca.
+* **Detalhes Completos:** O aplicativo retorna o pôster do filme, a sinopse em português e a nota média de avaliação.
+* **Fontes de Streaming:** Exibe uma lista clara dos serviços de assinatura onde o filme está disponível no Brasil.
+* **Interface Web Interativa:** Construído com Streamlit para uma experiência de usuário limpa e responsiva.
+
+![Demonstração do App](imgs/print1.png)
+
+![Demonstração do App 2](imgs/print2.png)
+
+---
+
 ## 🎯 Objetivos do Projeto
 
 - **Resolver um problema real**: Acabar com a necessidade de buscar manualmente por um filme em múltiplos aplicativos de streaming.
@@ -16,15 +29,55 @@ O projeto consome e combina dados de duas APIs distintas para fornecer uma respo
 
 ---
 
-## 📄 Fonte dos Dados (Data Source)
+## 🤖 Arquitetura da Solução
 
-Este projeto não utiliza um dataset estático. Ele consome dados em tempo real de duas APIs RESTful, garantindo que as informações estejam sempre atualizadas:
+O aplicativo funciona como um pipeline que é ativado pela interação do usuário, seguindo um fluxo claro de requisições e processamento de dados:
 
-- **[Watchmode API](https://watchmode.com/api/)**  
-  Fonte principal para descobrir em quais serviços de streaming (Netflix, Prime Video, etc.) um título está disponível, filtrando por região (Brasil).
+```text
++--------------------------------+
+| 🌐 Interface Web (Streamlit)   |
+|--------------------------------|
+|   Campo de busca de filme      |
+|   (Input do Usuário)           |
++--------------------------------+
+                 |
+                 | (1. Busca pelo nome do filme em inglês)
+                 ▼
++--------------------------------+
+| 🤖 API Watchmode (Busca)       |
+|--------------------------------|
+|  Retorna o ID do Watchmode     |
+|  e o ID do TMDb do filme       |
++--------------------------------+
+                 |
+      +----------+-----------+
+      |                      |
+(2. Busca pelos        (3. Busca pelas fontes
+ detalhes com o          de streaming com o
+ ID do TMDb)             ID do Watchmode)
+      ▼                      ▼
++----------------+  +-----------------+
+| 🤖 API TMDb    |  | 🤖 API Watchmode|
+| (Detalhes)     |  | (Fontes)        |
+|----------------|  |-----------------|
+| Retorna:       |  | Retorna:        |
+| - Sinopse (PT) |  | - Lista de      |
+| - Nota Média   |  |   Streamings    |
+| - Pôster       |  |   (Assinatura)  |
++----------------+  +-----------------+
+      |                      |
+      +----------+-----------+
+                 |
+                 | (4. Combina e Exibe os Resultados)
+                 ▼
++--------------------------------+
+| 🌐 Interface Web (Streamlit)   |
+|--------------------------------|
+|  Exibe o resultado completo    |
+|  e organizado para o usuário   |
++--------------------------------+
 
-- **[TMDb API (The Movie Database)](https://developer.themoviedb.org/docs)**  
-  Utilizada para enriquecer os dados, buscando informações detalhadas como sinopse em português, nota média e pôster oficial.
+```
 
 ---
 
@@ -46,73 +99,17 @@ Este projeto não utiliza um dataset estático. Ele consome dados em tempo real 
 ```
 ---
 
-## ✨ Funcionalidades
+## 📄 Fonte dos Dados (Data Source)
 
-* **Busca Simples:** Digite o nome de um filme (em inglês) para iniciar a busca.
-* **Detalhes Completos:** O aplicativo retorna o pôster do filme, a sinopse em português e a nota média de avaliação.
-* **Fontes de Streaming:** Exibe uma lista clara dos serviços de assinatura onde o filme está disponível no Brasil.
-* **Interface Web Interativa:** Construído com Streamlit para uma experiência de usuário limpa e responsiva.
+Este projeto não utiliza um dataset estático. Ele consome dados em tempo real de duas APIs RESTful, garantindo que as informações estejam sempre atualizadas:
 
-![Demonstração do App](imgs/print1.png)
+- **[Watchmode API](https://watchmode.com/api/)**  
+  Fonte principal para descobrir em quais serviços de streaming (Netflix, Prime Video, etc.) um título está disponível, filtrando por região (Brasil).
 
-![Demonstração do App 2](imgs/print2.png)
-
+- **[TMDb API (The Movie Database)](https://developer.themoviedb.org/docs)**  
+  Utilizada para enriquecer os dados, buscando informações detalhadas como sinopse em português, nota média e pôster oficial.
+  
 ---
-
-## 🧰 Ferramentas Utilizadas
-
-- ✅ **Python** — Lógica de backend e aplicação
-- ✅ **Streamlit** — Criação da interface web
-- ✅ **Requests** — Consumo das APIs via HTTP
-- ✅ **Dotenv** — Gerenciamento seguro das chaves de API
-- ✅ **Git & GitHub** — Versionamento e hospedagem do código
-- ✅ **Streamlit Community Cloud** — Deploy gratuito do app
-
----
-
-## 🤖 Arquitetura da Solução
-
-```text
-+----------------------------------------+
-| 🌐 Interface Web (Streamlit)           |
-|----------------------------------------|
-| Campo de busca de filme (input)        |
-+----------------------------------------+
-                  |
-                  ▼
-(1) Busca pelo nome do filme em inglês (Watchmode)
-                  |
-                  ▼
-+----------------------------------------+
-| 🤖 API Watchmode (Busca Inicial)       |
-|----------------------------------------|
-| Retorna:                               |
-| - ID do Watchmode                      |
-| - ID do TMDb                           |
-+----------------------------------------+
-        |                                |
-        ▼                                ▼
-(2) Detalhes via TMDb            (3) Fontes via Watchmode
-        ▼                                ▼
-+-------------------------------+  +-------------------------------+
-| 🤖 API TMDb (Detalhes)        |  | 🤖 API Watchmode (Streamings) |
-|-------------------------------|  |-------------------------------|
-| Retorna:                      |  | Retorna:                      |
-| - Sinopse em português        |  | - Plataformas disponíveis     |
-| - Nota média de avaliação     |  |   no Brasil                   |
-| - Pôster oficial              |  +-------------------------------+
-+-------------------------------+
-                  |
-                  ▼
-(4) Combinação e exibição dos dados na interface
-                  ▼
-+----------------------------------------+
-| 🌐 Interface Web (Streamlit)           |
-|----------------------------------
-
-
-```
-
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -127,6 +124,7 @@ Este projeto foi uma oportunidade para praticar a orquestração de diferentes f
 * **Segurança:** Utilização de variáveis de ambiente (`.env`) para proteger as chaves de API.
 
 ---
+
 
 ## 🚀 Como Executar Localmente
 
