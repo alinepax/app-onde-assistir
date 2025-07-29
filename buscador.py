@@ -79,3 +79,16 @@ if st.button('Buscar'):
                 st.error(f"Não foi possível encontrar o filme '{filme_desejado}'. Verifique o título e tente novamente.")
     else:
         st.warning('Por favor, digite o nome de um filme.')
+
+# --- RODAPÉ E CRÉDITOS ---
+# Eu adiciono uma linha divisória para separar o conteúdo do rodapé.
+st.markdown("---")
+
+# Eu uso st.markdown para criar um rodapé com HTML para melhor formatação.
+st.markdown("""
+<div style="text-align: center; font-size: 0.9em; color: grey;">
+    <p>Desenvolvido com ❤️ por <strong>Aline Paz</strong></p>
+    <p>Dados de filmes fornecidos por <a href="https://www.themoviedb.org/" target="_blank">TMDb</a> | Dados de streaming fornecidos por <a href="https://watchmode.com/" target="_blank">Watchmode</a>.</p>
+</div>
+""", unsafe_allow_html=True)
+
