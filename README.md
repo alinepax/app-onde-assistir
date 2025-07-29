@@ -28,6 +28,24 @@ Este projeto não utiliza um dataset estático. Ele consome dados em tempo real 
 
 ---
 
+## 📁 Estrutura do Repositório
+
+```
+/app-onde-assistir/
+|
+├── 📂 imgs/          # Pasta com os screenshots do projeto
+|   ├── print1.png    
+|   └── print2.png
+|
+├── .env              # Arquivo local com as chaves de API (ignorado pelo Git)
+├── .gitignore        # Ignora arquivos sensíveis e pastas irrelevantes para o Git
+├── buscador.py       # Script principal com a lógica e interface Streamlit
+├── README.md         # Esta documentação do projeto
+└── requirements.txt  # Dependências para rodar o app
+
+```
+---
+
 ## ✨ Funcionalidades
 
 * **Busca Simples:** Digite o nome de um filme (em inglês) para iniciar a busca.
@@ -55,44 +73,45 @@ Este projeto não utiliza um dataset estático. Ele consome dados em tempo real 
 ## 🤖 Arquitetura da Solução
 
 ```text
-+--------------------------------+
-| 🌐 Interface Web (Streamlit)   |
-|--------------------------------|
-|   Campo de busca de filme      |
-|   (Input do Usuário)           |
-+--------------------------------+
-                 |
-                 ▼
-(1. Busca pelo nome do filme em inglês na Watchmode)
-                 |
-                 ▼
-+--------------------------------+
-| 🤖 API Watchmode (Busca)       |
-|--------------------------------|
-|  Retorna o ID do Watchmode     |
-|  e o ID do TMDb do filme       |
-+--------------------------------+
-        |                          |
-        ▼                          ▼
-(2. Busca por detalhes)      (3. Busca por fontes)
-    via TMDb API               via Watchmode API
-        ▼                          ▼
-+----------------+        +-----------------+
-| 🤖 API TMDb    |        | 🤖 API Watchmode|
-|----------------|        |-----------------|
-| - Sinopse (PT) |        | - Streamings    |
-| - Nota Média   |        |   disponíveis   |
-| - Pôster       |        +-----------------+
-+----------------+
-        |
-        ▼
-(4. Combina e exibe os dados)
-        ▼
-+--------------------------------+
-| 🌐 Interface Web (Streamlit)   |
-|--------------------------------|
-| Resultado completo e organizado|
-+--------------------------------+
++----------------------------------------+
+| 🌐 Interface Web (Streamlit)           |
+|----------------------------------------|
+| Campo de busca de filme (input)        |
++----------------------------------------+
+                  |
+                  ▼
+(1) Busca pelo nome do filme em inglês (Watchmode)
+                  |
+                  ▼
++----------------------------------------+
+| 🤖 API Watchmode (Busca Inicial)       |
+|----------------------------------------|
+| Retorna:                               |
+| - ID do Watchmode                      |
+| - ID do TMDb                           |
++----------------------------------------+
+        |                                |
+        ▼                                ▼
+(2) Detalhes via TMDb            (3) Fontes via Watchmode
+        ▼                                ▼
++-------------------------------+  +-------------------------------+
+| 🤖 API TMDb (Detalhes)        |  | 🤖 API Watchmode (Streamings) |
+|-------------------------------|  |-------------------------------|
+| Retorna:                      |  | Retorna:                      |
+| - Sinopse em português        |  | - Plataformas disponíveis     |
+| - Nota média de avaliação     |  |   no Brasil                   |
+| - Pôster oficial              |  +-------------------------------+
++-------------------------------+
+                  |
+                  ▼
+(4) Combinação e exibição dos dados na interface
+                  ▼
++----------------------------------------+
+| 🌐 Interface Web (Streamlit)           |
+|----------------------------------
+
+
+```
 
 
 ## 🛠️ Tecnologias Utilizadas
