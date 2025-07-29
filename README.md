@@ -14,9 +14,6 @@ O projeto consome e combina dados de duas APIs distintas para fornecer uma respo
 * **Fontes de Streaming:** Exibe uma lista clara dos serviços de assinatura onde o filme está disponível no Brasil.
 * **Interface Web Interativa:** Construído com Streamlit para uma experiência de usuário limpa e responsiva.
 
-![Demonstração do App](imgs/print1.png)
-
-![Demonstração do App 2](imgs/print2.png)
 
 ---
 
@@ -122,6 +119,14 @@ Este projeto foi uma oportunidade para praticar a orquestração de diferentes f
     * **The Movie Database (TMDb) API:** Para buscar os detalhes dos filmes, como pôster, sinopse e avaliação.
 * **Gerenciamento de Dependências:** `pip` e `requirements.txt`
 * **Segurança:** Utilização de variáveis de ambiente (`.env`) para proteger as chaves de API.
+
+---
+
+## 🖼️ Prévia do Projeto
+
+![Demonstração do App](imgs/print1.png)
+
+![Demonstração do App 2](imgs/print2.png)
 
 ---
 
