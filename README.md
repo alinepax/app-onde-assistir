@@ -9,10 +9,11 @@ O projeto consome e combina dados de duas APIs distintas para fornecer uma respo
 
 ## ✨ Funcionalidades
 
-* **Busca Simples:** Digite o nome de um filme (em inglês) para iniciar a busca.
-* **Detalhes Completos:** O aplicativo retorna o pôster do filme, a sinopse em português e a nota média de avaliação.
-* **Fontes de Streaming:** Exibe uma lista clara dos serviços de assinatura onde o filme está disponível no Brasil.
-* **Interface Web Interativa:** Construído com Streamlit para uma experiência de usuário limpa e responsiva.
+* **Busca Inteligente:** Digite o nome de um filme (em inglês) para iniciar a busca.
+* **Seleção de Versão:** Para filmes com várias adaptações (como "Orgulho e Preconceito"), o app exibe uma lista para você escolher a versão correta.
+* **Detalhes Completos:** O aplicativo retorna o pôster do filme, a sinopse em português e a nota média de avaliação do TMDb.
+* **Fontes de Streaming:** Exibe uma lista clara e organizada de onde o filme está disponível, separado por **Assinatura, Aluguel e Compra**.
+* **Interface Web Interativa:** Construído com Streamlit para uma experiência de usuário limpa, responsiva e com navegação fluida.
 
 
 ---
@@ -124,6 +125,8 @@ Este projeto foi uma oportunidade para praticar a orquestração de diferentes f
 
 ## 🖼️ Prévia do Projeto
 
+Tela de busca e resultado final para um filme, exibindo pôster, nota, sinopse e os serviços de streaming disponíveis.
+
 ![Demonstração do App](imgs/print1.png)
 
 ![Demonstração do App 2](imgs/print2.png)
@@ -137,7 +140,7 @@ Você pode rodar este projeto na sua própria máquina seguindo os passos abaixo
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
+    git clone [https://github.com/alinepax/app-onde-assistir.git](https://github.com/alinepax/app-onde-assistir.git)
     cd seu-repositorio
     ```
 
