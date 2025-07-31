@@ -3,7 +3,7 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 
-# Eu carrego minhas chaves secretas do arquivo .env
+# Eu carrego minhas chaves secretas do ficheiro .env
 load_dotenv()
 WATCHMODE_API_KEY = os.getenv("WATCHMODE_API_KEY")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
@@ -39,10 +39,12 @@ def buscar_filmes(nome_filme):
 
 def buscar_detalhes_filme(tmdb_id):
     """Busca detalhes, incluindo o pôster, no TMDb."""
+    if not tmdb_id: return None
     url = f"https://api.themoviedb.org/3/movie/{tmdb_id}?api_key={TMDB_API_KEY}&language=pt-BR"
     resposta = requests.get(url)
     if resposta.status_code == 200:
         dados = resposta.json()
+        if dados.get('success') is False: return None
         if dados.get('poster_path'):
             dados['poster_url'] = f"https://image.tmdb.org/t/p/w500{dados.get('poster_path')}"
         else:
@@ -52,6 +54,7 @@ def buscar_detalhes_filme(tmdb_id):
 
 def buscar_fontes_streaming(watchmode_id):
     """Busca as fontes de streaming no Watchmode."""
+    if not watchmode_id: return []
     url = f"https://api.watchmode.com/v1/title/{watchmode_id}/sources/?apiKey={WATCHMODE_API_KEY}&regions=BR"
     resposta = requests.get(url)
     return resposta.json() if resposta.status_code == 200 else []
@@ -62,10 +65,11 @@ st.set_page_config(page_title="Onde Assistir?", page_icon="🎬")
 st.title('🎬 Onde Assistir?')
 st.subheader('Nunca mais perca tempo procurando um filme!')
 
-# Eu uso o session_state para "lembrar" do estado da aplicação
-if 'resultados' not in st.session_state:
+if 'resultados' not in st.session_state: st.session_state.resultados = []
+if 'filme_selecionado' not in st.session_state: st.session_state.filme_selecionado = None
+
+def limpar_estado():
     st.session_state.resultados = []
-if 'filme_selecionado' not in st.session_state:
     st.session_state.filme_selecionado = None
 
 # --- Tela Inicial (Busca) ---
@@ -75,6 +79,7 @@ if not st.session_state.filme_selecionado and not st.session_state.resultados:
         submit_button = st.form_submit_button(label='Buscar')
 
         if submit_button and filme_desejado:
+            limpar_estado()
             with st.spinner('Buscando filmes...'):
                 resultados_busca = buscar_filmes(filme_desejado)
                 if not resultados_busca:
@@ -83,42 +88,43 @@ if not st.session_state.filme_selecionado and not st.session_state.resultados:
                     st.session_state.filme_selecionado = resultados_busca[0]
                     st.rerun()
                 else:
-                    st.session_state.resultados = sorted(resultados_busca, key=lambda x: x.get('year', 0), reverse=True)
+                    st.session_state.resultados = sorted(resultados_busca, key=lambda x: x.get('year') or 0, reverse=True)
 
 # --- Tela de Seleção (Múltiplos Resultados) ---
 if st.session_state.resultados:
     st.subheader("Encontrei estes filmes, qual você quer ver?")
     for filme in st.session_state.resultados:
-        if st.button(f"{filme.get('name')} ({filme.get('year')})", key=filme.get('id')):
-            st.session_state.filme_selecionado = filme
-            st.session_state.resultados = [] # Limpo a lista para não aparecer mais
-            st.rerun()
+        filme_id = filme.get('id')
+        if filme_id:
+            if st.button(f"{filme.get('name')} ({filme.get('year')})", key=filme_id):
+                st.session_state.filme_selecionado = filme
+                st.session_state.resultados = []
+                st.rerun()
 
 # --- Tela de Detalhes (Filme Selecionado) ---
 if st.session_state.filme_selecionado:
     if st.button('⬅️ Fazer Nova Busca'):
-        st.session_state.resultados = []
-        st.session_state.filme_selecionado = None
+        limpar_estado()
         st.rerun()
 
     filme = st.session_state.filme_selecionado
     with st.spinner('Buscando detalhes do filme selecionado...'):
         watchmode_id = filme.get("id")
         tmdb_id = filme.get("tmdb_id")
-        
         detalhes = buscar_detalhes_filme(tmdb_id)
-        fontes = buscar_fontes_streaming(watchmode_id)
-        
-        if detalhes:
-            st.header(f"{detalhes.get('title')} ({detalhes.get('release_date', 'N/A')[:4]})")
+        if detalhes and detalhes.get('overview'):
+            fontes = buscar_fontes_streaming(watchmode_id)
+            ano_lancamento = ""
+            data_lancamento = detalhes.get('release_date')
+            if data_lancamento and isinstance(data_lancamento, str) and len(data_lancamento) >= 4:
+                ano_lancamento = f"({data_lancamento[:4]})"
+            st.header(f"{detalhes.get('title', 'Filme não encontrado')} {ano_lancamento}")
             col1, col2 = st.columns([1, 2])
             with col1:
-                if detalhes['poster_url']:
-                    st.image(detalhes['poster_url'])
+                if detalhes.get('poster_url'): st.image(detalhes['poster_url'])
             with col2:
                 st.metric(label="Nota Média (TMDb)", value=f"{detalhes.get('vote_average', 0):.1f}/10")
                 st.write(f"**Sinopse:** {detalhes.get('overview', 'Não disponível.')}")
-            
             st.subheader('Onde Assistir no Brasil:')
             fontes_por_tipo = {"sub": set(), "rent": set(), "buy": set()}
             for fonte in fontes:
@@ -126,21 +132,19 @@ if st.session_state.filme_selecionado:
                 nome = fonte.get("name")
                 if tipo in fontes_por_tipo and nome:
                     fontes_por_tipo[tipo].add(nome)
-
             if fontes_por_tipo["sub"]:
                 st.write("**Por Assinatura:**")
-                for nome in sorted(list(fontes_por_tipo["sub"])):
-                    st.write(f"- {nome.replace('Globalplay', 'Globoplay')}")
+                for nome in sorted(list(fontes_por_tipo["sub"])): st.write(f"- {nome.replace('Globalplay', 'Globoplay')}")
             if fontes_por_tipo["rent"]:
                 st.write("**Para Alugar:**")
-                for nome in sorted(list(fontes_por_tipo["rent"])):
-                    st.write(f"- {nome.replace('Globalplay', 'Globoplay')}")
+                for nome in sorted(list(fontes_por_tipo["rent"])): st.write(f"- {nome.replace('Globalplay', 'Globoplay')}")
             if fontes_por_tipo["buy"]:
                 st.write("**Para Comprar:**")
-                for nome in sorted(list(fontes_por_tipo["buy"])):
-                    st.write(f"- {nome.replace('Globalplay', 'Globoplay')}")
+                for nome in sorted(list(fontes_por_tipo["buy"])): st.write(f"- {nome.replace('Globalplay', 'Globoplay')}")
             if not any(fontes_por_tipo.values()):
                 st.warning("Não encontrei informações de onde assistir para este filme no Brasil.")
+        else:
+            st.error("Desculpe, não consegui encontrar detalhes para esta versão do filme. Pode ser uma entrada de dados incorreta. Por favor, tente outra versão ou faça uma nova busca.")
 
 # --- RODAPÉ E CRÉDITOS ---
 st.markdown("---")

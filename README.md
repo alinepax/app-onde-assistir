@@ -9,11 +9,13 @@ O projeto consome e combina dados de duas APIs distintas para fornecer uma respo
 
 ## ✨ Funcionalidades
 
-* **Busca Inteligente:** Digite o nome de um filme (em inglês) para iniciar a busca.
+* **Busca Inteligente:** O mecanismo de busca trata automaticamente variações de títulos (ex: "and" vs "&") para garantir que o utilizador encontre sempre a lista de resultados mais completa.
 * **Seleção de Versão:** Para filmes com várias adaptações (como "Orgulho e Preconceito"), o app exibe uma lista para você escolher a versão correta.
+* **Fluxo Otimizado:** Se a busca retorna um único resultado, a aplicação pula a etapa de seleção e exibe diretamente a página de detalhes, melhorando a experiência do utilizador.
 * **Detalhes Completos:** O aplicativo retorna o pôster do filme, a sinopse em português e a nota média de avaliação do TMDb.
 * **Fontes de Streaming:** Exibe uma lista clara e organizada de onde o filme está disponível, separado por **Assinatura, Aluguel e Compra**.
 * **Interface Web Interativa:** Construído com Streamlit para uma experiência de usuário limpa, responsiva e com navegação fluida.
+* **Tratamento de Erros Robusto:** A aplicação valida os dados recebidos das APIs e exibe mensagens de erro amigáveis caso encontre uma entrada de "filme fantasma" (sem detalhes válidos), em vez de mostrar uma página em branco.
 
 
 ---
