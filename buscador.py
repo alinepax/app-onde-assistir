@@ -3,7 +3,7 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 
-# Eu carrego minhas chaves secretas do ficheiro .env
+# Eu carrego as minhas chaves secretas do ficheiro .env
 load_dotenv()
 WATCHMODE_API_KEY = os.getenv("WATCHMODE_API_KEY")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
@@ -81,14 +81,19 @@ if not st.session_state.filme_selecionado and not st.session_state.resultados:
         if submit_button and filme_desejado:
             limpar_estado()
             with st.spinner('Buscando filmes...'):
-                resultados_busca = buscar_filmes(filme_desejado)
-                if not resultados_busca:
+                resultados_brutos = buscar_filmes(filme_desejado)
+                
+                # Eu só considero os resultados que têm nome E ano.
+                resultados_validos = [f for f in resultados_brutos if f.get("name") and f.get("year")]
+
+                if not resultados_validos:
                     st.warning('Nenhum filme encontrado com esse nome.')
-                elif len(resultados_busca) == 1:
-                    st.session_state.filme_selecionado = resultados_busca[0]
+                elif len(resultados_validos) == 1:
+                    st.session_state.filme_selecionado = resultados_validos[0]
                     st.rerun()
                 else:
-                    st.session_state.resultados = sorted(resultados_busca, key=lambda x: x.get('year') or 0, reverse=True)
+                    st.session_state.resultados = sorted(resultados_validos, key=lambda x: x.get('year') or 0, reverse=True)
+
 
 # --- Tela de Seleção (Múltiplos Resultados) ---
 if st.session_state.resultados:
@@ -144,7 +149,7 @@ if st.session_state.filme_selecionado:
             if not any(fontes_por_tipo.values()):
                 st.warning("Não encontrei informações de onde assistir para este filme no Brasil.")
         else:
-            st.error("Desculpe, não consegui encontrar detalhes para esta versão do filme. Pode ser uma entrada de dados incorreta. Por favor, tente outra versão ou faça uma nova busca.")
+            st.error("Não foi possível carregar os detalhes para este filme. Isso geralmente acontece por uma inconsistência nos dados fornecidos pelas APIs. Por favor, tente outra versão da lista ou faça uma nova busca.")
 
 # --- RODAPÉ E CRÉDITOS ---
 st.markdown("---")
